@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fishing Game</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        button { margin: 5px; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Fishing Game</h1>
+    <p id="status">Welcome to the fishing game!</p>
+    <button onclick="game.startFishing()">Start Fishing</button>
+    <button onclick="game.upgradeRod()">Upgrade Rod</button>
+    <select id="waterBodySelect" onchange="game.changeWaterBody(this.value)">
+        <option value="Pond">Pond</option>
+        <option value="River">River</option>
+        <option value="Lake">Lake</option>
+        <option value="Ocean">Ocean</option>
+    </select>
+    <script>
+        class FishingGame {
+            constructor() {
+                this.fishCaught = 0;
+                this.isFishing = false;
+                this.fishTypes = [
+                    { name: "Salmon", rarity: "Common" },
+                    { name: "Trout", rarity: "Common" },
+                    { name: "Tuna", rarity: "Uncommon" },
+                    { name: "Shark", rarity: "Rare" },
+                    { name: "Golden Fish", rarity: "Legendary" }
+                ];
+                this.rodLevel = 1;
+                this.waterBodies = ["Pond", "River", "Lake", "Ocean"];
+                this.currentWaterBody = "Pond";
+            }
+
+            upgradeRod() {
+                if (this.rodLevel < 5) {
+                    this.rodLevel++;
+                    this.updateStatus(`Fishing rod upgraded to level ${this.rodLevel}!`);
+                } else {
+                    this.updateStatus("Your fishing rod is at max level!");
+                }
+            }
+
+            changeWaterBody(newWaterBody) {
+                if (this.waterBodies.includes(newWaterBody)) {
+                    this.currentWaterBody = newWaterBody;
+                    this.updateStatus(`You moved to ${newWaterBody} for fishing.`);
+                } else {
+                    this.updateStatus("Invalid water body.");
+                }
+            }
+
+            startFishing() {
+                if (this.isFishing) {
+                    this.updateStatus("You're already fishing!");
+                    return;
+                }
+
+                this.isFishing = true;
+                this.updateStatus(`Casting the fishing line in ${this.currentWaterBody}...`);
+
+                setTimeout(() => {
+                    this.catchFish();
+                }, Math.random() * 3000 + 2000 - this.rodLevel * 200); // Faster with better rod
+            }
+
+            catchFish() {
+                this.isFishing = false;
+                const fish = this.getRandomFish();
+                this.fishCaught++;
+                this.updateStatus(`You caught a ${fish.name} (${fish.rarity}) in ${this.currentWaterBody}!`);
+            }
+
+            getRandomFish() {
+                const probabilities = [
+                    { fish: this.fishTypes[0], chance: 40 }, // Salmon
+                    { fish: this.fishTypes[1], chance: 40 }, // Trout
+                    { fish: this.fishTypes[2], chance: 15 }, // Tuna
+                    { fish: this.fishTypes[3], chance: 4 },  // Shark
+                    { fish: this.fishTypes[4], chance: 1 }   // Golden Fish
+                ];
+
+                let random = Math.random() * 100;
+                let accumulatedChance = 0;
+
+                for (const { fish, chance } of probabilities) {
+                    accumulatedChance += chance;
+                    if (random <= accumulatedChance) {
+                        return fish;
+                    }
+                }
+            }
+
+            updateStatus(message) {
+                document.getElementById("status").innerText = message;
+            }
+        }
+
+        const game = new FishingGame()
+    </script>
+</body>
+</html>
